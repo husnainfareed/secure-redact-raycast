@@ -275,6 +275,33 @@ assert(
   badRegexRes.detections.length === 0
 );
 
+// ---------------------------------------------------------------- WRAPPED JWT
+section("Line-wrapped JWT");
+const wrappedJwt =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF\n0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+const wrappedRes = redact(`tok=${wrappedJwt} done`, "typed", "secrets", []);
+const wrappedTypes = wrappedRes.detections.map((d) => d.type);
+assert(
+  "wrapped JWT detected as a single JWT",
+  wrappedTypes.filter((t) => t === "JWT").length === 1,
+  `got types: ${wrappedTypes.join(",")}`
+);
+assert(
+  "wrapped JWT does not leak SESSION_TOKEN fragments",
+  !wrappedTypes.includes("SESSION_TOKEN"),
+  wrappedTypes.join(",")
+);
+assert(
+  "wrapped JWT signature not present in output",
+  !wrappedRes.text.includes("SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"),
+  wrappedRes.text
+);
+assert(
+  "wrapped JWT payload tail not present in output",
+  !wrappedRes.text.includes("0IjoxNTE2MjM5MDIyfQ"),
+  wrappedRes.text
+);
+
 // ---------------------------------------------------------------- OVERLAPS
 section("Overlap resolution");
 // JWT contains a long alphanumeric run; SESSION_TOKEN must not double-cover JWT.
