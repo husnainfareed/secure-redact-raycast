@@ -7,7 +7,14 @@
 
 /* eslint-disable @typescript-eslint/ban-types */
 
-type ExtensionPreferences = {}
+type ExtensionPreferences = {
+  /** Default Redaction Mode - How matched values are rewritten */
+  "defaultMode": "label" | "typed" | "indexed" | "masked",
+  /** Default Detection Policy - Which categories of patterns to scan for */
+  "defaultPolicy": "secrets" | "balanced" | "standard" | "enhanced",
+  /** Audit Log - Stores aggregate stats (no input/output text) in the local audit log */
+  "enableAudit": boolean
+}
 
 /** Preferences accessible in all the extension's commands */
 declare type Preferences = ExtensionPreferences

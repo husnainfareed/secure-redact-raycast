@@ -53,6 +53,7 @@ export default async function RedactClipboard() {
       }`
     );
   } catch (error) {
-    await showHUD("Error redacting clipboard");
+    const message = error instanceof Error ? error.message : String(error);
+    await showHUD(`Error: ${message}`);
   }
 }

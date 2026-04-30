@@ -41,7 +41,7 @@ export const patterns: PatternDefinition[] = [
   },
   {
     name: "DATABASE_URL",
-    pattern: /(?:postgres|mysql|mongodb):\/\/[^\s"']+/gi,
+    pattern: /(?:postgres(?:ql)?|mysql|mongodb):\/\/[^\s"']+/gi,
     category: "secrets",
     description: "Database connection string",
   },
@@ -51,12 +51,6 @@ export const patterns: PatternDefinition[] = [
       /-----BEGIN (?:RSA )?PRIVATE KEY-----[\s\S]*?-----END (?:RSA )?PRIVATE KEY-----/g,
     category: "secrets",
     description: "PEM private key",
-  },
-  {
-    name: "SESSION_TOKEN",
-    pattern: /\b[A-Za-z0-9]{32,128}\b/g,
-    category: "secrets",
-    description: "Session token (generic long alphanumeric)",
   },
 
   // PERSONAL TIER (BALANCED)
@@ -85,7 +79,7 @@ export const patterns: PatternDefinition[] = [
   {
     name: "CREDIT_CARD",
     pattern:
-      /\b(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|3[0-9]{13}|6(?:011|5[0-9]{2})[0-9]{12})\b/g,
+      /\b(?:(?:4\d{3}|5[1-5]\d{2}|6(?:011|5\d{2}))(?:[- ]?\d{4}){3}|3[47]\d{2}[- ]?\d{6}[- ]?\d{5}|3\d{3}[- ]?\d{6}[- ]?\d{4}|4\d{12}(?:\d{3})?|5[1-5]\d{14}|3[47]\d{13}|3\d{13}|6(?:011|5\d{2})\d{12})\b/g,
     validator: luhn,
     category: "financial",
     description: "Credit card number",
@@ -182,5 +176,13 @@ export const patterns: PatternDefinition[] = [
     validator: vin,
     category: "system",
     description: "Vehicle Identification Number",
+  },
+
+  // Generic fallback — listed last so specific patterns win on overlap ties.
+  {
+    name: "SESSION_TOKEN",
+    pattern: /\b[A-Za-z0-9]{32,128}\b/g,
+    category: "secrets",
+    description: "Session token (generic long alphanumeric)",
   },
 ];

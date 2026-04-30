@@ -6,6 +6,45 @@
   "author": "secure-redact",
   "categories": ["Developer Tools", "Productivity"],
   "license": "MIT",
+  "preferences": [
+    {
+      "name": "defaultMode",
+      "type": "dropdown",
+      "required": false,
+      "title": "Default Redaction Mode",
+      "description": "How matched values are rewritten",
+      "default": "typed",
+      "data": [
+        { "title": "Label ([REDACTED])", "value": "label" },
+        { "title": "Typed ([EMAIL_REDACTED])", "value": "typed" },
+        { "title": "Indexed ([EMAIL_1])", "value": "indexed" },
+        { "title": "Masked (jo***@***.com)", "value": "masked" }
+      ]
+    },
+    {
+      "name": "defaultPolicy",
+      "type": "dropdown",
+      "required": false,
+      "title": "Default Detection Policy",
+      "description": "Which categories of patterns to scan for",
+      "default": "balanced",
+      "data": [
+        { "title": "Secrets", "value": "secrets" },
+        { "title": "Balanced", "value": "balanced" },
+        { "title": "Standard", "value": "standard" },
+        { "title": "Enhanced", "value": "enhanced" }
+      ]
+    },
+    {
+      "name": "enableAudit",
+      "type": "checkbox",
+      "required": false,
+      "title": "Audit Log",
+      "label": "Record redaction stats locally",
+      "description": "Stores aggregate stats (no input/output text) in the local audit log",
+      "default": true
+    }
+  ],
   "commands": [
     {
       "name": "redact-clipboard",

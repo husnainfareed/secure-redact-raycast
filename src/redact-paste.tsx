@@ -52,6 +52,7 @@ export default async function RedactAndPaste() {
       );
     }
   } catch (error) {
-    await showHUD("Error processing clipboard");
+    const message = error instanceof Error ? error.message : String(error);
+    await showHUD(`Error: ${message}`);
   }
 }
