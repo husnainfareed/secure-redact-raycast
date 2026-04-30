@@ -6,7 +6,7 @@ export const patterns: PatternDefinition[] = [
   {
     name: "JWT",
     pattern:
-      /\beyJ[A-Za-z0-9_-]+(?:\s+[A-Za-z0-9_-]+)*\s*\.\s*eyJ[A-Za-z0-9_-]+(?:\s+[A-Za-z0-9_-]+)*\s*\.\s*[A-Za-z0-9_-]+(?:\s+[A-Za-z0-9_-]+)*/g,
+      /\beyJ[A-Za-z0-9_-]+(?:\s+[A-Za-z0-9_-]+)*\s*\.\s*eyJ[A-Za-z0-9_-]+(?:\s+[A-Za-z0-9_-]+)*\s*\.\s*[A-Za-z0-9_-]+/g,
     category: "secrets",
     description: "JSON Web Token",
   },

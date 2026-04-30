@@ -301,6 +301,17 @@ assert(
   !wrappedRes.text.includes("0IjoxNTE2MjM5MDIyfQ"),
   wrappedRes.text
 );
+const trailingRes = redact(
+  `JWT: ${wrappedJwt}\nCard: 4539 1488 0343 6467`,
+  "typed",
+  "secrets",
+  []
+);
+assert(
+  "wrapped JWT does not eat the next line's leading word",
+  trailingRes.text.includes("\nCard:"),
+  trailingRes.text
+);
 
 // ---------------------------------------------------------------- OVERLAPS
 section("Overlap resolution");
