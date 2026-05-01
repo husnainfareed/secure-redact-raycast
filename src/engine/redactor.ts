@@ -35,7 +35,7 @@ function getReplacementText(
     case "typed":
       return `[${detection.type}_REDACTED]`;
 
-    case "indexed":
+    case "indexed": {
       const key = `${detection.type}:${detection.value}`;
       if (!indexMap.has(key)) {
         const nextIndex =
@@ -45,6 +45,7 @@ function getReplacementText(
         indexMap.set(key, nextIndex);
       }
       return `[${detection.type}_${indexMap.get(key)}]`;
+    }
 
     case "masked":
       return maskValue(detection.value, detection.type);
@@ -56,7 +57,7 @@ function getReplacementText(
 
 function maskValue(value: string, type: string): string {
   switch (type) {
-    case "EMAIL":
+    case "EMAIL": {
       const emailParts = value.split("@");
       if (emailParts.length === 2) {
         const [local, domain] = emailParts;
@@ -72,34 +73,39 @@ function maskValue(value: string, type: string): string {
         return `${maskedLocal}@${maskedDomain}`;
       }
       return "***@***.com";
+    }
 
-    case "PHONE_US":
+    case "PHONE_US": {
       const digits = value.replace(/\D/g, "");
       if (digits.length >= 10) {
         return `${digits.slice(0, 3)}-***-****`;
       }
       return "***-***-****";
+    }
 
-    case "CREDIT_CARD":
+    case "CREDIT_CARD": {
       const cardDigits = value.replace(/\D/g, "");
       if (cardDigits.length >= 13) {
         return `****-****-****-${cardDigits.slice(-4)}`;
       }
       return "****-****-****-****";
+    }
 
-    case "IPV4":
+    case "IPV4": {
       const ipParts = value.split(".");
       if (ipParts.length === 4) {
         return `${ipParts[0]}.${ipParts[1]}.***.***.`;
       }
       return "***.***.***.***";
+    }
 
-    case "SSN":
+    case "SSN": {
       const ssnDigits = value.replace(/\D/g, "");
       if (ssnDigits.length === 9) {
         return `***-**-${ssnDigits.slice(-4)}`;
       }
       return "***-**-****";
+    }
 
     default:
       if (value.length <= 4) {

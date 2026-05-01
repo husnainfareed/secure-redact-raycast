@@ -176,6 +176,7 @@ export default function Workbench() {
         id="result"
         title={`Output (${result?.detections.length || 0} detections)`}
         value={result?.text || ""}
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         onChange={() => {}}
       />
     </Form>

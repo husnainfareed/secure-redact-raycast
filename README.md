@@ -1,146 +1,93 @@
 # Secure Redact
 
-**100% offline data redaction for sensitive information.** Secure Redact is a macOS-native Raycast extension that detects 26+ signatures of sensitive data (API keys, JWTs, credit cards, SSNs, IBANs, crypto addresses, IPs, paths, etc.) and rewrites them in one of four modes before you paste into AI tools, GitHub tickets, logs, or emails. Detection is pure regex + checksum validation (Luhn, IBAN mod-97, VIN). **No AI model. No cloud. No telemetry.**
+**100% offline data redaction for sensitive information.** Detects 26+ signatures (API keys, JWTs, credit cards, SSNs, IBANs, crypto addresses, IPs, paths, and more) and rewrites them in one of four modes before you paste into AI tools, GitHub tickets, logs, or emails. Detection is pure regex + checksum validation (Luhn, IBAN mod-97, VIN). **No AI model. No cloud. No telemetry.**
 
 ## Commands
 
-| Command           | Description                                         | Recommended Hotkey |
-|-------------------|----------------------------------------------------|--------------------|
-| Redact Clipboard  | Sanitize clipboard content in place               | ⌥⇧R                |
-| Redact & Paste    | Sanitize and paste to active app                  | ⌥⇧V                |
-| Open Workbench    | Interactive editor with live preview              | (none)             |
-| Audit Log         | View redaction history                             | (none)             |
-| Threat Feeds      | Custom pattern management                          | (none)             |
-| Settings          | Manage local data                                  | (none)             |
+| Command          | Description                                  | Recommended Hotkey |
+| ---------------- | -------------------------------------------- | ------------------ |
+| Redact Clipboard | Sanitize clipboard content in place          | ⌥⇧R                |
+| Redact & Paste   | Sanitize and paste to active app             | ⌥⇧V                |
+| Open Workbench   | Interactive editor with live preview         | —                  |
+| Audit Log        | View redaction history (stats only)          | —                  |
+| Threat Feeds     | Manage custom regex patterns                 | —                  |
+| Settings         | Manage local data and view privacy details   | —                  |
 
 ## Detection Coverage
 
-All detection patterns and modes are available with no tier restrictions.
+Coverage scales with the selected detection policy. Default: **Balanced**.
 
-### Secrets
-| Pattern           | Description                    | Validator     |
-|-------------------|--------------------------------|---------------|
-| JWT               | JSON Web Token                 | Structure     |
-| AWS_ACCESS_KEY    | AWS Access Key ID              | Format        |
-| GITHUB_PAT        | GitHub Personal Access Token  | Format        |
-| STRIPE_KEY        | Stripe Secret Key              | Format        |
-| GOOGLE_API_KEY    | Google API Key                 | Format        |
-| PASSWORD_FIELD    | Password in configuration      | Length        |
-| DATABASE_URL      | Database connection string     | Format        |
-| PRIVATE_KEY       | PEM private key                | Structure     |
-| SESSION_TOKEN     | Generic session token          | Length        |
+| Policy   | Includes                                                         |
+| -------- | ---------------------------------------------------------------- |
+| Secrets  | API keys, JWTs, passwords, sessions, DB strings, PEM keys        |
+| Balanced | Secrets + emails, phones, SSNs                                   |
+| Standard | Balanced + credit cards, IBANs, SWIFT, BTC/ETH/LTC/XMR addresses |
+| Enhanced | Standard + IPv4/IPv6, MAC, UUID, URLs, Unix/Windows paths, VIN   |
 
-### Personal
-| Pattern           | Description                    | Validator     |
-|-------------------|--------------------------------|---------------|
-| EMAIL             | Email address                  | Format        |
-| PHONE_US          | US phone number                | Format        |
-| SSN               | Social Security Number         | Area codes    |
+### Patterns
 
-### Financial
-| Pattern           | Description                    | Validator     |
-|-------------------|--------------------------------|---------------|
-| CREDIT_CARD       | Credit card number             | Luhn          |
-| IBAN              | International Bank Account     | Mod-97        |
-| SWIFT_BIC         | SWIFT/BIC code                 | Format        |
-| BITCOIN_ADDRESS   | Bitcoin address                | Checksum      |
-| ETHEREUM_ADDRESS  | Ethereum address               | Format        |
-| LITECOIN_ADDRESS  | Litecoin address               | Checksum      |
-| MONERO_ADDRESS    | Monero address                 | Format        |
+**Secrets** — JWT, AWS access key, GitHub PAT, Stripe key, Google API key, password fields, database URLs (Postgres/MySQL/MongoDB), PEM private keys, generic session tokens.
 
-### Network & System
-| Pattern           | Description                    | Validator     |
-|-------------------|--------------------------------|---------------|
-| IPV4              | IPv4 address                   | Format        |
-| IPV6              | IPv6 address                   | Format        |
-| MAC_ADDRESS       | MAC address                    | Format        |
-| URL               | HTTP/HTTPS URL                 | Format        |
-| UUID              | UUID/GUID                      | Format        |
-| UNIX_PATH         | Unix file path                 | Format        |
-| WINDOWS_PATH      | Windows file path              | Format        |
-| VIN               | Vehicle Identification Number  | Check digit   |
+**Personal** — Email, US phone numbers, SSN (with area-code validation).
 
-## Privacy
+**Financial** — Credit cards (Luhn-validated), IBAN (mod-97), SWIFT/BIC, Bitcoin, Ethereum, Litecoin, Monero.
 
-**Secure Redact makes zero network calls and stores no sensitive data.**
-
-### What is stored locally:
-- **Audit entries**: `secure-redact.audit.v1` - Redaction statistics only (capped at 500 entries)
-- **Threat feeds**: `secure-redact.feeds.v1` - User-defined patterns for custom detection
-
-### What is NEVER stored:
-- Original input text or detected values
-- Redacted output text or clipboard contents
-- File contents, paths, or metadata
-- Network activity or browsing history
-
-All data remains on your device in Raycast's LocalStorage. No telemetry, analytics, or external communication.
+**Network & System** — IPv4, IPv6, MAC, HTTP/HTTPS URLs, UUID, Unix paths, Windows paths, VIN (check-digit validated).
 
 ## Modes
 
-### Label Mode
-Replaces all sensitive data with a generic label.
-
+### Label
+Generic placeholder for every match.
 ```
-Input:  Contact john.doe@company.com for API key AKIAIOSFODNN7EXAMPLE
-Output: Contact [REDACTED] for API key [REDACTED]
-```
-
-### Typed Mode
-Replaces sensitive data with type-specific labels.
-
-```
-Input:  Contact john.doe@company.com for API key AKIAIOSFODNN7EXAMPLE
-Output: Contact [EMAIL_REDACTED] for API key [AWS_ACCESS_KEY_REDACTED]
+Input:  Contact john.doe@company.com for AKIAIOSFODNN7EXAMPLE
+Output: Contact [REDACTED] for [REDACTED]
 ```
 
-### Indexed Mode
-Maintains referential consistency with numbered labels.
+### Typed (default)
+Type-specific placeholders.
+```
+Input:  Contact john.doe@company.com for AKIAIOSFODNN7EXAMPLE
+Output: Contact [EMAIL_REDACTED] for [AWS_ACCESS_KEY_REDACTED]
+```
 
+### Indexed
+Stable per-value tokens — same input → same token.
 ```
 Input:  Email john.doe@company.com and cc john.doe@company.com
 Output: Email [EMAIL_1] and cc [EMAIL_1]
 ```
 
-### Masked Mode
-Preserves structure while hiding sensitive parts.
-
+### Masked
+Preserves shape, hides core.
 ```
 Input:  Contact john.doe@company.com, card 4539 1488 0343 6467
 Output: Contact jo***@***.com, card ****-****-****-6467
 ```
 
-## Policies
+## Privacy
 
-| Policy   | Includes                                                                 |
-|----------|--------------------------------------------------------------------------|
-| Secrets  | API keys, JWTs, passwords, sessions, DB strings, PEM keys                |
-| Balanced | Secrets + emails, phones, SSNs                                           |
-| Standard | Balanced + credit cards, IBANs, SWIFT codes, BTC/ETH/LTC/XMR             |
-| Enhanced | Standard + IPv4/IPv6, MAC, UUID, URLs, Unix/Windows paths, VIN           |
+Secure Redact makes zero network calls and stores no input or output text.
 
-## Recommended Hotkeys
+**Stored locally (Raycast LocalStorage):**
+- `secure-redact.audit.v1` — aggregate redaction stats, capped at 500 entries
+- `secure-redact.feeds.v1` — user-defined custom patterns
 
-Configure these shortcuts in Raycast Preferences → Extensions → Secure Redact:
+**Never stored:** original text, redacted output, clipboard contents, file metadata, or network activity.
+
+## Hotkeys
+
+Configure in Raycast Preferences → Extensions → Secure Redact:
 
 - **⌥⇧R** → Redact Clipboard
 - **⌥⇧V** → Redact & Paste
 
-These hotkeys allow instant redaction without opening any UI, perfect for quick data sanitization before sharing.
-
 ## Limitations
 
-- **Pattern-based detection has known limits**. Always review output before sharing sensitive content.
-- **Not a compliance tool**. GDPR/HIPAA/PCI DSS require additional controls beyond pattern matching.
-- **Checksum validation prevents many false positives** but cannot eliminate them entirely.
-- **Custom threat feeds** require careful regex construction to avoid performance issues.
+- Pattern-based detection has known limits — review output before sharing.
+- Not a compliance tool. GDPR / HIPAA / PCI DSS require additional controls.
+- Checksum validation reduces false positives but does not eliminate them.
+- Custom threat feeds require careful regex construction to avoid catastrophic backtracking.
 
-## Installation
+## License
 
-1. Install via Raycast Store: Search "Secure Redact"
-2. Configure hotkeys in Raycast Preferences
-3. Start using with clipboard operations or open the Workbench
-
----
-
-*Built with security and privacy as core principles. No AI models, no cloud dependencies, no data collection.*
+MIT

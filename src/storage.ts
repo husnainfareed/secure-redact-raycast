@@ -1,4 +1,5 @@
 import { LocalStorage } from "@raycast/api";
+import { randomUUID } from "node:crypto";
 import { AuditEntry, ThreatFeed } from "./types";
 
 const AUDIT_KEY = "secure-redact.audit.v1";
@@ -22,7 +23,7 @@ export async function addAuditEntry(
   const entries = await getAuditEntries();
   const newEntry: AuditEntry = {
     ...entry,
-    id: crypto.randomUUID(),
+    id: randomUUID(),
   };
 
   entries.unshift(newEntry);
@@ -59,7 +60,7 @@ export async function addThreatFeed(
   const feeds = await getThreatFeeds();
   const newFeed: ThreatFeed = {
     ...feed,
-    id: crypto.randomUUID(),
+    id: randomUUID(),
     created: Date.now(),
     modified: Date.now(),
   };
